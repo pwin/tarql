@@ -1,12 +1,6 @@
 package org.deri.tarql;
 
-import static org.deri.tarql.Helpers.binding;
-import static org.deri.tarql.Helpers.bindings;
-import static org.deri.tarql.Helpers.vars;
-
-import java.util.Arrays;
-import java.util.List;
-
+import junit.framework.TestCase;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
@@ -18,7 +12,10 @@ import org.apache.jena.sparql.syntax.ElementData;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.junit.Test;
 
-import junit.framework.TestCase;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.deri.tarql.Helpers.*;
 
 
 public class ARQTest extends TestCase {

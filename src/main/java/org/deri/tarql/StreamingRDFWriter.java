@@ -7,8 +7,8 @@ import java.util.Map.Entry;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.system.RiotLib;
-import org.apache.jena.riot.system.StreamOps;
 import org.apache.jena.riot.system.StreamRDF;
+import org.apache.jena.riot.system.StreamRDFOps;
 import org.apache.jena.riot.writer.WriterStreamRDFBlocks;
 import org.apache.jena.riot.writer.WriterStreamRDFPlain;
 import org.apache.jena.shared.PrefixMapping;
@@ -46,7 +46,7 @@ public class StreamingRDFWriter {
 			writer = new StreamRDFDedup(writer, dedupWindowSize);
 		}
 		writer.start();
-		StreamOps.sendTriplesToStream(triples, writer);
+		StreamRDFOps.sendTriplesToStream(triples, writer);
 		writer.finish();
 	}
 
@@ -59,11 +59,11 @@ public class StreamingRDFWriter {
 			// Jena's streaming Turtle writers don't output base even if it is provided,
 			// so we write it directly.
 			IndentedWriter w = new IndentedWriter(out);
-			RiotLib.writeBase(w, baseIRI);
+			RiotLib.writeBase(w,baseIRI.toString(),true);
 			w.flush();
 		}
 		
-		StreamRDF writer = new WriterStreamRDFBlocks(out);
+		StreamRDF writer = new WriterStreamRDFBlocks(out,null);
 		if (dedupWindowSize > 0) {
 			writer = new StreamRDFDedup(writer, dedupWindowSize);
 		}
@@ -72,7 +72,7 @@ public class StreamingRDFWriter {
 		for (Entry<String, String> e : prefixes.getNsPrefixMap().entrySet()) {
 			writer.prefix(e.getKey(), e.getValue());
 		}
-		StreamOps.sendTriplesToStream(triples, writer);
+		StreamRDFOps.sendTriplesToStream(triples, writer);
 		writer.finish();
 	}
 	

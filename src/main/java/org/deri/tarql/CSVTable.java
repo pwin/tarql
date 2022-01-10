@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.opencsv.exceptions.CsvValidationException;
 import org.apache.jena.sparql.algebra.Table;
 import org.apache.jena.sparql.algebra.table.TableBase;
 import org.apache.jena.sparql.core.Var;
@@ -154,7 +155,7 @@ public class CSVTable extends TableBase implements Table {
 			CSVParser result = options.openParserFor(source);
 			openIterators.add(result);
 			return result;
-		} catch (IOException ex) {
+		} catch (IOException | CsvValidationException ex) {
 			throw new RuntimeException(ex);
 		}
 	}

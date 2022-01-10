@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 import java.io.StringReader;
 
+import com.opencsv.exceptions.CsvValidationException;
 import org.junit.Test;
 
 import com.opencsv.CSVReader;
@@ -14,7 +15,7 @@ import com.opencsv.CSVReader;
 public class OpenCSVTest {
 
 	@Test
-	public void test() throws IOException {
+	public void test() throws IOException, CsvValidationException {
 		CSVReader r = new CSVReader(new StringReader("a,b\n1,2\n3,4"));
 		try {
 			assertArrayEquals(new String[]{"a","b"}, r.readNext());
