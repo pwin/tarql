@@ -1,5 +1,7 @@
 package org.deri.tarql;
 
+import com.opencsv.exceptions.CsvValidationException;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -232,7 +234,7 @@ public class CSVOptions {
 	 * @return a parser for the source, configured with the options from this instance
 	 * @throws IOException if an I/O error occurs while opening the source
 	 */
-	public CSVParser openParserFor(InputStreamSource source) throws IOException {
+	public CSVParser openParserFor(InputStreamSource source) throws IOException, CsvValidationException {
 		return new CSVParser(openReaderFor(source), 
 				columnNamesInFirstRow == null ? true : columnNamesInFirstRow,
 				delimiter, quote, escape);

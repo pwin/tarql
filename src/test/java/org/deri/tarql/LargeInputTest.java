@@ -108,7 +108,7 @@ public class LargeInputTest {
 	@Test public void testDummyContentSource() throws IOException {
 		final int lines = 5;
 		BufferedReader r = new BufferedReader(
-				new InputStreamReader(new DummyContentSource(lines).open(), Charsets.UTF_8));
+				new InputStreamReader(new DummyContentSource(lines).open(), Charsets.toCharset("utf-8")));
 		int readLines = 0;
 		while (r.readLine() != null) {
 			readLines++;

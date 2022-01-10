@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.opencsv.exceptions.CsvValidationException;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
@@ -64,7 +65,7 @@ public class CSVParser implements ClosableIterator<Binding> {
 	 * @throws IOException if an I/O error occurs while reading from the input
 	 */
 	public CSVParser(Reader reader, boolean varsFromHeader, Character delimiter, Character quote, Character escape)
-			throws IOException {
+			throws IOException, CsvValidationException {
 		this.reader = reader;
 		this.varsFromHeader = varsFromHeader;
 		this.delimiter = delimiter == null ? ',' : delimiter;
@@ -166,7 +167,7 @@ public class CSVParser implements ClosableIterator<Binding> {
 				rownum++;
 				break;
 			}
-		} catch (IOException e) {
+		} catch (IOException | CsvValidationException e) {
 			throw new TarqlException(e);
 		}
 		return current;
@@ -193,7 +194,7 @@ public class CSVParser implements ClosableIterator<Binding> {
 		return varsWithRowNum;
 	}
 	
-	private void init() throws IOException {
+	private void init() throws IOException, CsvValidationException {
 		String[] row;
 		csv = new CSVReaderBuilder(reader).withCSVParser(
 				new CSVParserBuilder()
