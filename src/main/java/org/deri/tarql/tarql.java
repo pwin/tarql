@@ -5,6 +5,7 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.jar.Manifest;
 
 import org.apache.jena.atlas.io.IndentedWriter;
@@ -70,7 +71,8 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl baseArg = new ArgDecl(true, "base");
 	private final ArgDecl writeBaseArg = new ArgDecl(false, "write-base");
 	private final ArgDecl dedupArg = new ArgDecl(true, "dedup");
-	
+	private final ArgDecl graphArg = new ArgDecl(true, "graph", "g");
+
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
 	private boolean stdin = false;
@@ -80,7 +82,8 @@ public class tarql extends CmdGeneral {
 	private String baseIRI = null;
 	private boolean writeBase = false;
 	private int dedupWindowSize = 0;
-	
+	private Optional<String> graphLocation = Optional.empty();
+
 	private ExtendedIterator<Triple> resultTripleIterator = NullIterator.instance();
 	
 	public tarql(String[] args) {
@@ -102,7 +105,8 @@ public class tarql extends CmdGeneral {
 		add(withoutHeaderArg, "-H   --no-header-row", "Input file has no header row; use variable names ?a, ?b, ...");
 		add(withHeaderArg,    "--header-row", "Input file's first row is a header with variable names (default)");
 		add(baseArg,          "--base", "Base IRI for resolving relative IRIs");
-		
+		add(graphArg,          "-g	--graph", "The location of an existing graph to query against");
+
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to an input file");
 		getUsage().addUsage("table.csv", "CSV/TSV file to be processed; can be omitted if specified in FROM clause");
@@ -183,6 +187,12 @@ public class tarql extends CmdGeneral {
 				cmdError("Value of --dedup must be integer >= 0");
 			}
 		}
+		if (hasArg(graphArg)) {
+			if (getValue(graphArg) == null) {
+				cmdError("--graph needs a valid filename to import");
+			}
+			this.graphLocation = Optional.of(getValue(graphArg));
+		}
 	}
 
 	@Override
@@ -196,15 +206,15 @@ public class tarql extends CmdGeneral {
 				q.makeTest();
 			}
 			if (stdin) {
-				processResults(TarqlQueryExecutionFactory.create(q, 
+				processResults(TarqlQueryExecutionFactory.create(q,
 						InputStreamSource.fromStdin(), options));
 			} else if (csvFiles.isEmpty()) {
 				processResults(TarqlQueryExecutionFactory.create(q, options));
 			} else {
 				for (String csvFile: csvFiles) {
 					URLOptionsParser parseResult = new URLOptionsParser(csvFile);
-					processResults(TarqlQueryExecutionFactory.create(q, 
-							InputStreamSource.fromFilenameOrIRI(parseResult.getRemainingURL()), 
+					processResults(TarqlQueryExecutionFactory.create(q,
+							InputStreamSource.fromFilenameOrIRI(parseResult.getRemainingURL()),
 							parseResult.getOptions(options)));
 				}
 			}
@@ -252,6 +262,7 @@ public class tarql extends CmdGeneral {
 	}
 	
 	private void processResults(TarqlQueryExecution ex) throws IOException {
+		ex.backgroundData(graphLocation);
 		if (testQuery && ex.getFirstQuery().getConstructTemplate() != null) {
 			IndentedWriter out = new IndentedWriter(System.out); 
 			new FmtTemplate(out, new SerializationContext(ex.getFirstQuery())).format(ex.getFirstQuery().getConstructTemplate());
