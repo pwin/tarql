@@ -4,9 +4,10 @@ Tarql is a command-line tool for converting CSV files to RDF using SPARQL 1.1 sy
 
 **See http://tarql.github.io/ for documentation.**
 
-## Building
+## Building this fork  
+Note: For the original version get your code from the TARQL GitHub: http://github.com/tarql/tarql
 
-Get the code from GitHub: http://github.com/tarql/tarql
+Get the code from GitHub: http://github.com/pwin/tarql
 
 Tarql uses Maven. To create executable scripts for Windows and Unix in `/target/appassembler/bin/tarql`:
 
