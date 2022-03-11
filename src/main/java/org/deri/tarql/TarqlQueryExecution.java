@@ -2,6 +2,7 @@ package org.deri.tarql;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Optional;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
@@ -29,6 +30,7 @@ import org.deri.tarql.functions.ExpandPrefixFunction;
 public class TarqlQueryExecution {
 	private final CSVTable table;
 	private final TarqlQuery tq;
+	Optional<String> backgroundData;
 
 	/**
 	 * Sets up a new query execution.
@@ -56,6 +58,20 @@ public class TarqlQueryExecution {
 		}
 		table = new CSVTable(source, options);
 		tq = query;
+	}
+
+	/**
+	 * Specify a set of triples to use as background/existing data for querying, IRI resolution
+	 * etc. during the construction process. All data will become part of the output along with
+	 * the CSV being imported.
+	 *
+	 * @param dataLocation A filename or anything that Jena's model.read(...) can use.
+	 *
+	 * @return <code>this</code>
+	 */
+	public TarqlQueryExecution backgroundData(Optional<String> dataLocation) {
+		this.backgroundData = dataLocation;
+		return this;
 	}
 
 	/**
@@ -132,6 +148,7 @@ public class TarqlQueryExecution {
 
 	public Iterator<Triple> execTriples() throws IOException {
 		Model model = ModelFactory.createDefaultModel();
+		this.backgroundData.ifPresent(location -> model.read(location));
 		ExtendedIterator<Triple> result = new NullIterator<Triple>();
 		for (Query q: tq.getQueries()) {
 			modifyQuery(q, table);
